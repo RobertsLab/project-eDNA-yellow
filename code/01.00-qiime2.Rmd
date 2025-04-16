@@ -1,0 +1,131 @@
+---
+title: "01.00-qiime2"
+author: "Sam White"
+date: "2025-04-16"
+output: 
+  github_document:
+    toc: true
+    number_sections: true
+  bookdown::html_document2:
+    theme: cosmo
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+bibliography: references.bib
+---
+
+# BACKGROUND
+
+This notebook will use [QIIME 2 2024.10](https://docs.qiime2.org/2024.10/) [@bolyen2019] to taxonomically classify eukaryotic sequences in eDNA samples.
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(reticulate)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,        # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  comment = ""         # Prevents appending '##' to beginning of lines in code output
+)
+```
+
+Inputs:
+
+
+Outputs:
+
+
+
+Software requirements:
+
+-   Utilizes a [`qiime2-amplicon-2024.10`](https://docs.qiime2.org/2024.10/) Conda/Mamba environment, per the installation instructions.
+
+To use on your own system, replace with name of your qiime2-amplicon-2024.10 environment and the path to the corresponding conda installation (find this *after* you've activated the environment).
+
+E.g.
+
+``` bash
+# Activate environment
+conda activate ShortStack4_env
+
+# Find conda path
+which conda
+```
+
+------------------------------------------------------------------------
+
+# Set R variables
+
+```{r R-variables, eval=TRUE}
+# Conda info
+qiime2_conda_env_name <- c("qiime2-amplicon-2024.10")
+qiime2_conda_path <- c("/home/sam/programs/miniforge3/condabin/conda")
+
+# Data directories
+data_dir <- "../data/"
+raw_reads_url <- "https://owl.fish.washington.edu/nightingales/eDNA-yellow_island-2023/"
+
+# Output files/directories
+output_dir <- "../output/01.00-qiime2/"
+
+# Export these as environment variables for bash chunks.
+Sys.setenv(
+  data_dir = data_dir,
+  raw_reads_url = raw_reads_url,
+  output_dir = output_dir
+)
+
+```
+
+# Load [`qiime2-amplicon-2024.10`](https://docs.qiime2.org/2024.10/) conda environment
+
+If this is successful, the first line of output should show that the Python being used is the one in your [`qiime2-amplicon-2024.10`](https://docs.qiime2.org/2024.10/) conda environment path.
+
+E.g.
+
+`python:         /home/sam/programs/mambaforge/envs/mirmachine_env/bin/python`
+
+```{r load-qiim2-conda-env, eval=TRUE}
+use_condaenv(condaenv = qiime2_conda_env_name, conda = qiime2_conda_path)
+
+# Check successful env loading
+py_config()
+```
+
+# Download raw FastQs
+```{r download-raw-fastqs, engine = bash, eval=TRUE}
+wget \
+--directory-prefix ${data_dir} \
+--recursive \
+--no-check-certificate \
+--continue \
+--cut-dirs 3 \
+--no-host-directories \
+--no-parent \
+--quiet \
+--accept "*.fastq.gz,*.md5" ${raw_reads_url}
+
+ls -lh "${data_dir}"
+```
+
+## Verify raw read checksums
+```{r verify-raw-read-checksums, engine='bash', eval=TRUE}
+
+cd "${data_dir}"
+
+for md5 in *.md5
+do
+  md5sum --check "${md5}"
+done
+```

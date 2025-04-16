@@ -1,0 +1,13 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.fq
+*.fastq
+*.fq.gz
+*.fastq.gz
+*.ht2
+*.bashvars
+*.bam
+.DS_Store
+*.bt2

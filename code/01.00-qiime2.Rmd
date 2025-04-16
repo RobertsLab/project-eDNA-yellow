@@ -74,6 +74,7 @@ qiime2_conda_path <- c("/home/sam/programs/miniforge3/condabin/conda")
 
 # Data directories
 data_dir <- "../data/"
+raw_reads_dir <- "../data/raw-fastqs"
 raw_reads_url <- "https://owl.fish.washington.edu/nightingales/eDNA-yellow_island-2023/"
 
 # Output files/directories
@@ -82,6 +83,7 @@ output_dir <- "../output/01.00-qiime2/"
 # Export these as environment variables for bash chunks.
 Sys.setenv(
   data_dir = data_dir,
+  raw_reads_dir = raw_reads_dir,
   raw_reads_url = raw_reads_url,
   output_dir = output_dir
 )
@@ -104,9 +106,19 @@ py_config()
 ```
 
 # Download raw FastQs
+
+Reads are downloaded from 
+https://owl.fish.washington.edu/nightingales/eDNA-yellow_island-2023/
+
+The `--cut-dirs 3` command cuts the preceding directory structure (i.e. `nightingales/eDNA-yellow_island-2023/`)
+so that we just end up with the reads.
+
 ```{r download-raw-fastqs, engine = bash, eval=TRUE}
+# Make output directory if it doesn't exist
+mkdir --parents "${raw_reads_dir}"
+
 wget \
---directory-prefix ${data_dir} \
+--directory-prefix "${raw_reads_dir}" \
 --recursive \
 --no-check-certificate \
 --continue \
@@ -114,15 +126,16 @@ wget \
 --no-host-directories \
 --no-parent \
 --quiet \
---accept "*.fastq.gz,*.md5" ${raw_reads_url}
+--accept "*.fastq.gz,*.md5" \
+"${raw_reads_url}"
 
-ls -lh "${data_dir}"
+ls -lh "${raw_reads_dir}"
 ```
 
 ## Verify raw read checksums
-```{r verify-raw-read-checksums, engine='bash', eval=TRUE}
+```{r verify-raw-read-checksums, engine=bash, eval=TRUE}
 
-cd "${data_dir}"
+cd "${raw_reads_dir}"
 
 for md5 in *.md5
 do

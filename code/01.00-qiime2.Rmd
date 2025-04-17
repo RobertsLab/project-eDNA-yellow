@@ -105,46 +105,7 @@ use_condaenv(condaenv = qiime2_conda_env_name, conda = qiime2_conda_path)
 py_config()
 ```
 
-# Download raw FastQs
 
-Reads are downloaded from 
-https://owl.fish.washington.edu/nightingales/eDNA-yellow_island-2023/
-
-The `--cut-dirs 3` command cuts the preceding directory structure (i.e. `nightingales/eDNA-yellow_island-2023/`)
-so that we just end up with the reads.
-
-```{r download-raw-fastqs, engine = bash, eval=TRUE}
-# Make output directory if it doesn't exist
-mkdir --parents "${raw_reads_dir}"
-
-wget \
---directory-prefix "${raw_reads_dir}" \
---recursive \
---no-check-certificate \
---continue \
---cut-dirs 3 \
---no-host-directories \
---no-parent \
---quiet \
---accept "*.fastq.gz,*.md5" \
-"${raw_reads_url}"
-
-ls -lh "${raw_reads_dir}"
-```
-
-## Verify raw read checksums
-
-Removes MD5 files after check to facilitate directory parsing by QIIME 2
-```{r verify-raw-read-checksums, engine=bash, eval=TRUE}
-
-cd "${raw_reads_dir}"
-
-for md5 in *.md5
-do
-  md5sum --check "${md5}"
-  rm "${md5}"
-done
-```
 
 ## Rename files to match QIIME 2 conventions
 
@@ -174,4 +135,12 @@ qiime tools import \
   --input-format CasavaOneEightSingleLanePerSampleDirFmt \
   --output-path "${output_dir}"/demux-paired-end.qza
 
+```
+
+# Deblur
+```{r deblur, engine=bash, eval=TRUE}
+qiime quality-filter q-score \
+ --i-demux "${output_dir}"/demux-paired-end.qza \
+ --o-filtered-sequences "${output_dir}"/demux-paired-end-filtered.qza \
+ --o-filter-stats "${output_dir}"/demux-paired-end-filter-stats.qza
 ```

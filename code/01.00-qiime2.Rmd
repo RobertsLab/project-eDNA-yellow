@@ -133,6 +133,8 @@ ls -lh "${raw_reads_dir}"
 ```
 
 ## Verify raw read checksums
+
+Removes MD5 files after check to facilitate directory parsing by QIIME 2
 ```{r verify-raw-read-checksums, engine=bash, eval=TRUE}
 
 cd "${raw_reads_dir}"
@@ -140,5 +142,36 @@ cd "${raw_reads_dir}"
 for md5 in *.md5
 do
   md5sum --check "${md5}"
+  rm "${md5}"
 done
+```
+
+## Rename files to match QIIME 2 conventions
+
+QIIME 2 expects a lane designation in the file names.
+
+```{r rename-fastqs, engine=bash, eval=TRUE}
+# Rename FastQ files to include lane information
+for file in "${raw_reads_dir}"/*_R[12]_001.fastq.gz
+do
+  new_file=$(echo "$file" | sed 's/_\(R[12]_001\)/_L001_\1/')
+  echo "Renaming $file to $new_file"
+  mv "$file" "$new_file"
+done
+
+ls -lh "${raw_reads_dir}"
+```
+
+
+# Import raw reads
+```{r import-raw-reads, engine=bash, eval=TRUE}
+# Make output directory if it doesn't exist
+mkdir --parents "${output_dir}"
+
+qiime tools import \
+  --type 'SampleData[PairedEndSequencesWithQuality]' \
+  --input-path "${raw_reads_dir}" \
+  --input-format CasavaOneEightSingleLanePerSampleDirFmt \
+  --output-path "${output_dir}"/demux-paired-end.qza
+
 ```

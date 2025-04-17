@@ -1,0 +1,198 @@
+---
+title: "00.00-fastqc-multiqc-raw-reads"
+author: "Sam White"
+date: "2025-04-17"
+output: 
+  github_document:
+    toc: true
+    number_sections: true
+  bookdown::html_document2:
+    theme: cosmo
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    code_download: true
+bibliography: references.bib
+---
+
+# BACKGROUND
+
+This notebook will download raw sequencing reads from https://owl.fish.washington.edu/nightingales/eDNA-yellow_island-2023/ and run an initial quality assessement using [FastQC](https://github.com/s-andrews/FastQC) and [MultiQC](https://github.com/MultiQC/MultiQC) [@ewels2016].
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(reticulate)
+knitr::opts_chunk$set(
+  echo = TRUE,         # Display code chunks
+  eval = FALSE,        # Evaluate code chunks
+  warning = FALSE,     # Hide warnings
+  message = FALSE,     # Hide messages
+  comment = ""         # Prevents appending '##' to beginning of lines in code output
+)
+```
+
+Inputs:
+
+- Paired-end FastQs
+
+  - Example filename format: `Yell_July18_Site1f_S92_L001_R[12]_001.fastq.gz`
+
+Outputs:
+
+- FastQC HTML files.
+
+- MultiQC HTML report.
+
+Software requirements:
+
+-   [FastQC](https://github.com/s-andrews/FastQC)
+
+-   [MultiQC](https://github.com/MultiQC/MultiQC) [@ewels2016]
+
+# Set R variables
+
+```{r R-variables, eval=TRUE}
+
+# Data directories
+data_dir <- "../data/"
+raw_reads_dir <- "../data/raw-fastqs"
+raw_reads_url <- "https://owl.fish.washington.edu/nightingales/eDNA-yellow_island-2023/"
+
+# PROGRAMS
+fastqc <- "/home/shared/FastQC-0.12.1/fastqc"
+multiqc <- "/home/sam/programs/mambaforge/bin/multiqc"
+
+# ARRAYS
+## Create a list of fastq files (replace with your actual list)
+raw_fastqs_list <- list.files(path = raw_reads_dir, pattern = "*.fastq.gz", full.names = TRUE)
+
+# Convert the R list to a string that bash can parse into an array
+raw_fastqs_string <- paste(raw_fastqs_list, collapse = " ")
+
+# CPUs
+threads <- "40"
+                           
+# Export these as environment variables for bash chunks.
+Sys.setenv(
+  fastqc = fastqc,
+  data_dir = data_dir,
+  multiqc = multiqc, 
+  raw_reads_dir = raw_reads_dir,
+  raw_reads_url = raw_reads_url,
+  output_dir = output_dir,
+  raw_fastqs_string = raw_fastqs_string,
+  threads = threads
+)
+
+```
+
+# Download raw FastQs
+
+The `--cut-dirs 3` command cuts the preceding directory structure (i.e. `nightingales/eDNA-yellow_island-2023/`)
+so that we just end up with the reads.
+
+```{r download-raw-fastqs, engine = bash, eval=TRUE}
+# Make output directory if it doesn't exist
+mkdir --parents "${raw_reads_dir}"
+
+wget \
+--directory-prefix "${raw_reads_dir}" \
+--recursive \
+--no-check-certificate \
+--continue \
+--cut-dirs 3 \
+--no-host-directories \
+--no-parent \
+--quiet \
+--accept "*.fastq.gz,*.md5" \
+"${raw_reads_url}"
+
+ls -lh "${raw_reads_dir}"
+```
+
+## Verify raw read checksums
+
+Removes MD5 files after check to facilitate downstream directory parsing by QIIME 2.
+```{r verify-raw-read-checksums, engine=bash, eval=TRUE}
+
+cd "${raw_reads_dir}"
+
+for md5 in *.md5
+do
+  md5sum --check "${md5}"
+  rm "${md5}"
+done
+```
+
+
+# FastQC/MultiQC on raw reads
+
+```{r raw-fastqc-multiqc, engine=bash, eval=TRUE}
+
+# Make output directory if it doesn't exist
+mkdir --parents "${raw_reads_dir}"
+
+cd "${raw_reads_dir}"
+
+############ RUN FASTQC ############
+
+
+# Create array of trimmed FastQs
+# Access the individual FastQ files from the array
+IFS=' ' read -r -a raw_fastqs_array <<< "${raw_fastqs_string}"
+
+# Pass array contents to new variable as space-delimited list
+raw_fastqc_list=$(echo "${raw_fastqs_array[*]}")
+
+echo "Beginning FastQC on raw reads..."
+echo ""
+
+# Run FastQC
+### NOTE: Do NOT quote raw_fastqc_list
+${fastqc} \
+--threads ${threads} \
+--outdir ${raw_reads_dir} \
+--quiet \
+${raw_fastqc_list}
+
+echo "FastQC on raw reads complete!"
+echo ""
+
+############ END FASTQC ############
+
+############ RUN MULTIQC ############
+echo "Beginning MultiQC on raw FastQC..."
+echo ""
+
+${multiqc} --interactive \
+${raw_reads_dir} \
+-o ${raw_reads_dir}
+
+echo ""
+echo "MultiQC on raw FastQs complete."
+echo ""
+
+############ END MULTIQC ############
+
+echo "Removing FastQC zip files."
+echo ""
+rm ${raw_reads_dir}/*.zip
+echo "FastQC zip files removed."
+echo ""
+```
+
+```{r check-file-listing, engine=bash, eval=TRUE}
+
+# View directory contents
+ls -lh ${raw_reads_dir}
+
+```

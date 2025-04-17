@@ -71,27 +71,19 @@ raw_reads_url <- "https://owl.fish.washington.edu/nightingales/eDNA-yellow_islan
 fastqc <- "/home/sam/programs/FastQC-0.12.1/fastqc"
 multiqc <- "/home/sam/programs/miniforge3/bin/multiqc"
 
-# ARRAYS
-## Create a list of fastq files (replace with your actual list)
-raw_fastqs_list <- list.files(path = raw_reads_dir, pattern = "*.fastq.gz", full.names = TRUE)
-
-## Convert the R list to a string that bash can parse into an array
-raw_fastqs_string <- paste(raw_fastqs_list, collapse = " ")
-
 # CPUs
 threads <- 4
-                           
+
+
 # Export these as environment variables for bash chunks.
 Sys.setenv(
   fastqc = fastqc,
   data_dir = data_dir,
-  multiqc = multiqc, 
+  multiqc = multiqc,
   raw_reads_dir = raw_reads_dir,
   raw_reads_url = raw_reads_url,
-  raw_fastqs_string = raw_fastqs_string,
   threads = threads
 )
-
 ```
 
 # Download raw FastQs
@@ -116,6 +108,16 @@ wget \
 "${raw_reads_url}"
 
 ls -lh "${raw_reads_dir}"
+```
+
+## Create a list of fastq files
+```{r populate-fastq-list, eval=TRUE}
+# Create the fastq list and string
+raw_fastqs_list <- list.files(path = Sys.getenv("raw_reads_dir"), pattern = "\\.fastq\\.gz$", full.names = TRUE)
+raw_fastqs_string <- paste(raw_fastqs_list, collapse = " ")
+
+# Update the environment variable with the actual string
+Sys.setenv(raw_fastqs_string = raw_fastqs_string)
 ```
 
 ## Verify raw read checksums
@@ -150,6 +152,8 @@ IFS=' ' read -r -a raw_fastqs_array <<< "${raw_fastqs_string}"
 
 # Pass array contents to new variable as space-delimited list
 raw_fastqc_list=$(echo "${raw_fastqs_array[*]}")
+
+echo "${raw_fastqc_list}"
 
 echo "Beginning FastQC on raw reads..."
 echo ""

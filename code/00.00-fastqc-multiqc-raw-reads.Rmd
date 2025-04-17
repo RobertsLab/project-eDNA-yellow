@@ -68,18 +68,18 @@ raw_reads_dir <- "../data/raw-fastqs"
 raw_reads_url <- "https://owl.fish.washington.edu/nightingales/eDNA-yellow_island-2023/"
 
 # PROGRAMS
-fastqc <- "/home/shared/FastQC-0.12.1/fastqc"
-multiqc <- "/home/sam/programs/mambaforge/bin/multiqc"
+fastqc <- "/home/sam/programs/FastQC-0.12.1/fastqc"
+multiqc <- "/home/sam/programs/miniforge3/bin/multiqc"
 
 # ARRAYS
 ## Create a list of fastq files (replace with your actual list)
 raw_fastqs_list <- list.files(path = raw_reads_dir, pattern = "*.fastq.gz", full.names = TRUE)
 
-# Convert the R list to a string that bash can parse into an array
+## Convert the R list to a string that bash can parse into an array
 raw_fastqs_string <- paste(raw_fastqs_list, collapse = " ")
 
 # CPUs
-threads <- "40"
+threads <- 4
                            
 # Export these as environment variables for bash chunks.
 Sys.setenv(
@@ -88,7 +88,6 @@ Sys.setenv(
   multiqc = multiqc, 
   raw_reads_dir = raw_reads_dir,
   raw_reads_url = raw_reads_url,
-  output_dir = output_dir,
   raw_fastqs_string = raw_fastqs_string,
   threads = threads
 )
@@ -100,7 +99,7 @@ Sys.setenv(
 The `--cut-dirs 3` command cuts the preceding directory structure (i.e. `nightingales/eDNA-yellow_island-2023/`)
 so that we just end up with the reads.
 
-```{r download-raw-fastqs, engine = bash, eval=TRUE}
+```{r download-raw-fastqs, engine='bash', eval=TRUE}
 # Make output directory if it doesn't exist
 mkdir --parents "${raw_reads_dir}"
 
@@ -122,7 +121,7 @@ ls -lh "${raw_reads_dir}"
 ## Verify raw read checksums
 
 Removes MD5 files after check to facilitate downstream directory parsing by QIIME 2.
-```{r verify-raw-read-checksums, engine=bash, eval=TRUE}
+```{r verify-raw-read-checksums, engine='bash', eval=TRUE}
 
 cd "${raw_reads_dir}"
 
@@ -136,12 +135,11 @@ done
 
 # FastQC/MultiQC on raw reads
 
-```{r raw-fastqc-multiqc, engine=bash, eval=TRUE}
+```{r raw-fastqc-multiqc, engine='bash', eval=TRUE}
 
 # Make output directory if it doesn't exist
 mkdir --parents "${raw_reads_dir}"
 
-cd "${raw_reads_dir}"
 
 ############ RUN FASTQC ############
 
@@ -190,7 +188,7 @@ echo "FastQC zip files removed."
 echo ""
 ```
 
-```{r check-file-listing, engine=bash, eval=TRUE}
+```{r check-file-listing, engine='bash', eval=TRUE}
 
 # View directory contents
 ls -lh ${raw_reads_dir}

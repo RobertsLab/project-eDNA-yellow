@@ -1,0 +1,12 @@
+[2025-04-17 11:42:55,300] multiqc.core.file_search                           [INFO   ]  Search path: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/data/raw-fastqs
+[2025-04-17 11:42:59,198] multiqc.modules.fastqc.fastqc                      [INFO   ]  Found 119 reports
+[2025-04-17 11:42:59,198] multiqc.modules.fastqc.fastqc                      [WARNING]  Sample had zero reads: 'Yell_July18_Site1x_S119_R2_001'
+[2025-04-17 11:42:59,198] multiqc.modules.fastqc.fastqc                      [WARNING]  Sample had zero reads: 'Yell_July18_Site5dd_S135_R1_001'
+[2025-04-17 11:42:59,198] multiqc.modules.fastqc.fastqc                      [WARNING]  Sample had zero reads: 'Yell_July18_Site5gg_S138_R2_001'
+[2025-04-17 11:42:59,198] multiqc.modules.fastqc.fastqc                      [WARNING]  Sample had zero reads: 'Yell_July18_Site5d_S90_R1_001'
+[2025-04-17 11:42:59,199] multiqc.modules.fastqc.fastqc                      [WARNING]  Sample had zero reads: 'Yell_July18_Site1aa_S130_R1_001'
+[2025-04-17 11:42:59,199] multiqc.modules.fastqc.fastqc                      [WARNING]  Sample had zero reads: 'Yell_July18_Site1aa_S130_R2_001'
+[2025-04-17 11:42:59,199] multiqc.modules.fastqc.fastqc                      [WARNING]  Sample had zero reads: 'Yell_July18_Site5gg_S138_R1_001'
+[2025-04-17 11:42:59,199] multiqc.modules.fastqc.fastqc                      [WARNING]  Sample had zero reads: 'Yell_July18_Site5dd_S135_R2_001'
+[2025-04-17 11:42:59,199] multiqc.modules.fastqc.fastqc                      [WARNING]  Sample had zero reads: 'Yell_July18_Site1x_S119_R1_001'
+[2025-04-17 11:42:59,199] multiqc.modules.fastqc.fastqc                      [WARNING]  Sample had zero reads: 'Yell_July18_Site5d_S90_R2_001'

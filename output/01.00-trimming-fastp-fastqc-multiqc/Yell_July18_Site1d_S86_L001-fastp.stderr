@@ -1,0 +1,47 @@
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 175992
+total bases: 52973592
+Q20 bases: 50966331(96.2108%)
+Q30 bases: 46127771(87.0769%)
+
+Read2 before filtering:
+total reads: 175992
+total bases: 52973592
+Q20 bases: 50515107(95.359%)
+Q30 bases: 45150057(85.2313%)
+
+Read1 after filtering:
+total reads: 175131
+total bases: 34762184
+Q20 bases: 33850407(97.3771%)
+Q30 bases: 31225645(89.8265%)
+
+Read2 after filtering:
+total reads: 175131
+total bases: 34774103
+Q20 bases: 33347351(95.8971%)
+Q30 bases: 29949417(86.1256%)
+
+Filtering result:
+reads passed filter: 350262
+reads failed due to low quality: 866
+reads failed due to too many N: 0
+reads failed due to too short: 856
+reads with adapter trimmed: 236726
+bases trimmed due to adapters: 17773839
+
+Duplication rate: 19.514%
+
+Insert size peak (evaluated by paired-end reads): 167
+
+JSON report: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site1d_S86_L001.fastp-trim.report.json
+HTML report: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site1d_S86_L001.fastp-trim.report.html
+
+/home/sam/programs/fastp --in1 Yell_July18_Site1d_S86_R1_001.fastq.gz --in2 Yell_July18_Site1d_S86_R2_001.fastq.gz --detect_adapter_for_pe --trim_front1 10 --trim_front2 10 --trim_poly_g --thread 4 --html /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site1d_S86_L001.fastp-trim.report.html --json /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site1d_S86_L001.fastp-trim.report.json --out1 /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site1d_S86_L001_R1.fastp-trim.fastq.gz --out2 /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site1d_S86_L001_R2.fastp-trim.fastq.gz 
+fastp v0.24.0, time used: 25 seconds

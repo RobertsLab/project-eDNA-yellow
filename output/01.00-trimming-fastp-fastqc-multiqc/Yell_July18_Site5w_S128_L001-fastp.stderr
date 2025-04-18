@@ -18,15 +18,15 @@ Q30 bases: 3582(91.541%)
 
 Read1 after filtering:
 total reads: 13
-total bases: 2710
-Q20 bases: 2677(98.7823%)
-Q30 bases: 2576(95.0554%)
+total bases: 2580
+Q20 bases: 2550(98.8372%)
+Q30 bases: 2450(94.9612%)
 
 Read2 after filtering:
 total reads: 13
-total bases: 2710
-Q20 bases: 2653(97.8967%)
-Q30 bases: 2532(93.4317%)
+total bases: 2580
+Q20 bases: 2526(97.907%)
+Q30 bases: 2407(93.2946%)
 
 Filtering result:
 reads passed filter: 26
@@ -43,5 +43,5 @@ Insert size peak (evaluated by paired-end reads): 365
 JSON report: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site5w_S128_L001.fastp-trim.report.json
 HTML report: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site5w_S128_L001.fastp-trim.report.html
 
-/home/sam/programs/fastp --in1 Yell_July18_Site5w_S128_R1_001.fastq.gz --in2 Yell_July18_Site5w_S128_R2_001.fastq.gz --detect_adapter_for_pe --trim_front1 10 --trim_front2 10 --trim_poly_g --thread 4 --html /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site5w_S128_L001.fastp-trim.report.html --json /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site5w_S128_L001.fastp-trim.report.json --out1 /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site5w_S128_L001_R1.fastp-trim.fastq.gz --out2 /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site5w_S128_L001_R2.fastp-trim.fastq.gz 
+/home/sam/programs/fastp --in1 Yell_July18_Site5w_S128_R1_001.fastq.gz --in2 Yell_July18_Site5w_S128_R2_001.fastq.gz --detect_adapter_for_pe --trim_front1 20 --trim_front2 20 --trim_poly_g --thread 4 --html /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site5w_S128_L001.fastp-trim.report.html --json /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site5w_S128_L001.fastp-trim.report.json --out1 /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site5w_S128_L001_R1.fastp-trim.fastq.gz --out2 /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Yell_July18_Site5w_S128_L001_R2.fastp-trim.fastq.gz 
 fastp v0.24.0, time used: 1 seconds

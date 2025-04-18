@@ -110,16 +110,6 @@ wget \
 ls -lh "${raw_reads_dir}"
 ```
 
-## Create a list of fastq files
-```{r populate-fastq-list, eval=TRUE}
-# Create the fastq list and string
-raw_fastqs_list <- list.files(path = Sys.getenv("raw_reads_dir"), pattern = "\\.fastq\\.gz$", full.names = TRUE)
-raw_fastqs_string <- paste(raw_fastqs_list, collapse = " ")
-
-# Update the environment variable with the actual string
-Sys.setenv(raw_fastqs_string = raw_fastqs_string)
-```
-
 ## Verify raw read checksums
 
 Removes MD5 files after check to facilitate downstream directory parsing by QIIME 2.
@@ -133,6 +123,7 @@ do
   rm "${md5}"
 done
 ```
+
 
 
 # FastQC/MultiQC on raw reads
@@ -153,7 +144,6 @@ IFS=' ' read -r -a raw_fastqs_array <<< "${raw_fastqs_string}"
 # Pass array contents to new variable as space-delimited list
 raw_fastqc_list=$(echo "${raw_fastqs_array[*]}")
 
-echo "${raw_fastqc_list}"
 
 echo "Beginning FastQC on raw reads..."
 echo ""
@@ -190,6 +180,93 @@ echo ""
 rm ${raw_reads_dir}/*.zip
 echo "FastQC zip files removed."
 echo ""
+```
+# Check for empty/mismatched FastQs
+
+## Delete empty FastQs
+```{r delete-zero-reads, eval=TRUE}
+# Path to the fastqc_sequence_counts_plot.txt file
+counts_file <- file.path(Sys.getenv("raw_reads_dir"), "multiqc_data", "fastqc_sequence_counts_plot.txt")
+
+# Check if the file exists
+if (file.exists(counts_file)) {
+  # Read the file
+  counts_data <- read.table(counts_file, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+
+  # Identify samples with Unique Reads equal to 0.0
+  zero_reads_samples <- counts_data$Sample[counts_data$Unique.Reads == 0.0]
+
+  # Check if any samples with zero reads were found
+  if (length(zero_reads_samples) > 0) {
+    cat("FastQ files with zero unique reads found:\n")
+
+    # Loop through the samples and delete the corresponding FastQ files
+    for (sample in zero_reads_samples) {
+      # Construct the file path
+      fastq_file <- file.path(Sys.getenv("raw_reads_dir"), paste0(sample, ".fastq.gz"))
+
+      # Check if the file exists
+      if (file.exists(fastq_file)) {
+        # Delete the file
+        unlink(fastq_file)
+        cat("Deleted:", fastq_file, "\n")
+      } else {
+        cat("File not found:", fastq_file, "\n")
+      }
+    }
+  } else {
+    cat("No FastQ files with zero unique reads found.\n")
+  }
+} else {
+  cat("Error: fastqc_sequence_counts_plot.txt file not found at", counts_file, "\n")
+}
+```
+
+## Check for missing FastQ pairs
+```{r missing-fastq-pairs, eval=TRUE}
+# Create the fastq list and string
+raw_fastqs_list <- list.files(path = Sys.getenv("raw_reads_dir"), pattern = "\\.fastq\\.gz$", full.names = TRUE)
+raw_fastqs_string <- paste(raw_fastqs_list, collapse = " ")
+
+# Update the environment variable with the actual string
+Sys.setenv(raw_fastqs_string = raw_fastqs_string)
+
+# Check for matching R1 and R2 files
+r1_files <- grep("_R1_", raw_fastqs_list, value = TRUE)
+r2_files <- grep("_R2_", raw_fastqs_list, value = TRUE)
+
+# Extract sample names from R1 and R2 files
+r1_samples <- gsub("_R1_.*", "", basename(r1_files))
+r2_samples <- gsub("_R2_.*", "", basename(r2_files))
+
+# Find unmatched R1 files
+unmatched_r1 <- setdiff(r1_samples, r2_samples)
+if (length(unmatched_r1) > 0) {
+  cat("Unmatched R1 files:\n")
+  for (sample in unmatched_r1) {
+    r1_file <- grep(paste0("^", sample, "_R1_"), basename(r1_files), value = TRUE)
+    r1_file_path <- file.path(Sys.getenv("raw_reads_dir"), r1_file)
+    cat(r1_file, "\n")
+    # Delete unmatched R1 file
+    unlink(r1_file_path)
+    cat("Deleted:", r1_file_path, "\n")
+  }
+}
+
+# Find unmatched R2 files
+unmatched_r2 <- setdiff(r2_samples, r1_samples)
+if (length(unmatched_r2) > 0) {
+  cat("Unmatched R2 files:\n")
+  for (sample in unmatched_r2) {
+    r2_file <- grep(paste0("^", sample, "_R2_"), basename(r2_files), value = TRUE)
+    r2_file_path <- file.path(Sys.getenv("raw_reads_dir"), r2_file)
+    cat(r2_file, "\n")
+    # Delete unmatched R2 file
+    unlink(r2_file_path)
+    cat("Deleted:", r2_file_path, "\n")
+  }
+}
+
 ```
 
 ```{r check-file-listing, engine='bash', eval=TRUE}

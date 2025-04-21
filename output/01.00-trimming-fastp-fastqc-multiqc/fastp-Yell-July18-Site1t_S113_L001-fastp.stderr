@@ -1,0 +1,47 @@
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 199887
+total bases: 60165987
+Q20 bases: 56615760(94.0993%)
+Q30 bases: 47483740(78.9212%)
+
+Read2 before filtering:
+total reads: 199887
+total bases: 60165987
+Q20 bases: 57055908(94.8308%)
+Q30 bases: 50529585(83.9836%)
+
+Read1 after filtering:
+total reads: 198266
+total bases: 37439186
+Q20 bases: 36431265(97.3078%)
+Q30 bases: 33530460(89.5598%)
+
+Read2 after filtering:
+total reads: 198266
+total bases: 37449907
+Q20 bases: 35627770(95.1345%)
+Q30 bases: 31380321(83.7928%)
+
+Filtering result:
+reads passed filter: 396532
+reads failed due to low quality: 2256
+reads failed due to too many N: 4
+reads failed due to too short: 982
+reads with adapter trimmed: 269894
+bases trimmed due to adapters: 20396536
+
+Duplication rate: 1.88707%
+
+Insert size peak (evaluated by paired-end reads): 167
+
+JSON report: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/fastp-Yell-July18-Site1t_S113_L001.fastp-trim.report.json
+HTML report: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/fastp-Yell-July18-Site1t_S113_L001.fastp-trim.report.html
+
+/home/sam/programs/fastp --in1 Yell_July18_Site1t_S113_R1_001.fastq.gz --in2 Yell_July18_Site1t_S113_R2_001.fastq.gz --detect_adapter_for_pe --trim_front1 20 --trim_front2 20 --trim_poly_g --thread 4 --html /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/fastp-Yell-July18-Site1t_S113_L001.fastp-trim.report.html --json /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/fastp-Yell-July18-Site1t_S113_L001.fastp-trim.report.json --out1 /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/fastp-Yell-July18-Site1t_S113_L001_R1_001.fastq.gz --out2 /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/fastp-Yell-July18-Site1t_S113_L001_R2_001.fastq.gz 
+fastp v0.24.0, time used: 34 seconds

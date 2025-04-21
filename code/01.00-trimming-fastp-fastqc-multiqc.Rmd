@@ -54,7 +54,7 @@ Outputs:
 
 -   Trimmed FastQs.
 
-    -   Example filename format: `Yell_July18_Site1f_S92_L001_R1.fastp-trim.fastq.gz`
+    -   Example filename format: `fastp-Yell-July18-Site1z_S129_L001_R1_001.fastq.gz`
 
 -   fastp JSON files.
 
@@ -75,9 +75,10 @@ Software requirements:
 ```{r R-variables, eval=TRUE}
 
 # Data directories
-data_dir <- "/home/sam/gitrepos/RobertsLab/project-eDNA-yellow/data/"
-raw_reads_dir <- "/home/sam/gitrepos/RobertsLab/project-eDNA-yellow/data/raw-fastqs"
-output_dir <- "/home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc"
+repo_dir <- "/home/sam/gitrepos/RobertsLab/project-eDNA-yellow"
+data_dir <- file.path(repo_dir, "data")
+raw_reads_dir <- file.path(data_dir, "raw-fastqs")
+output_dir <- file.path(repo_dir, "output", "01.00-trimming-fastp-fastqc-multiqc")
 
 # PROGRAMS
 fastp <- "/home/sam/programs/fastp"
@@ -122,19 +123,21 @@ mkdir --parents "${output_dir}"
 cd "${raw_reads_dir}"
 
 # Create arrays of fastq R1 files and sample names
+# Renames to match QIIME2 regex
 for fastq in ${R1_fastq_pattern}
 do
   fastq_array_R1+=("${fastq}")
-  R1_names_array+=("$(echo "${fastq}" | awk -F'_' '{print $1"_"$2"_"$3"_"$4"_L001"}')")
+  R1_names_array+=("$(echo "${fastq}" | awk -F'_' '{print "fastp-"$1"-"$2"-"$3"_"$4"_L001"}')")
 done
 
 
 
 # Create array of fastq R2 files
+# Renames to match QIIME2 regex
 for fastq in ${R2_fastq_pattern}
 do
   fastq_array_R2+=("${fastq}")
-  R2_names_array+=("$(echo "${fastq}" | awk -F"_" '{print $1"_"$2"_"$3"_"$4"_L001"}')")
+  R2_names_array+=("$(echo "${fastq}" | awk -F"_" '{print "fastp-"$1"-"$2"-"$3"_"$4"_L001"}')")
 done
 
 # Create list of fastq files used in analysis
@@ -164,14 +167,14 @@ do
   --thread ${threads} \
   --html "${output_dir}"/"${R1_sample_name}".fastp-trim.report.html \
   --json "${output_dir}"/"${R1_sample_name}".fastp-trim.report.json \
-  --out1 "${output_dir}"/"${R1_sample_name}"_R1.fastp-trim.fastq.gz \
-  --out2 "${output_dir}"/"${R2_sample_name}"_R2.fastp-trim.fastq.gz \
+  --out1 "${output_dir}"/"${R1_sample_name}"_R1_001.fastq.gz \
+  --out2 "${output_dir}"/"${R2_sample_name}"_R2_001.fastq.gz \
   2>> "${output_dir}"/"${R1_sample_name}"-fastp.stderr
 
   # Generate md5 checksums for newly trimmed files
   cd "${output_dir}"
-  md5sum "${R1_sample_name}"_R1.fastp-trim.fastq.gz | tee "${R1_sample_name}"_R1.fastp-trim.fastq.gz.md5
-  md5sum "${R2_sample_name}"_R2.fastp-trim.fastq.gz | tee "${R2_sample_name}"_R2.fastp-trim.fastq.gz.md5
+  md5sum "${R1_sample_name}"_R1_001.fastq.gz | tee "${R1_sample_name}"_R1_001.fastq.gz.md5
+  md5sum "${R2_sample_name}"_R2_001.fastq.gz | tee "${R2_sample_name}"_R2_001.fastq.gz.md5
   
   # Change back to previous directory
   # Directing to /dev/null prevents printing directory each time.

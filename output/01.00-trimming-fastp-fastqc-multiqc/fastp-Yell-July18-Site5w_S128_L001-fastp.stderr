@@ -1,0 +1,47 @@
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 13
+total bases: 3913
+Q20 bases: 3810(97.3677%)
+Q30 bases: 3586(91.6432%)
+
+Read2 before filtering:
+total reads: 13
+total bases: 3913
+Q20 bases: 3788(96.8055%)
+Q30 bases: 3582(91.541%)
+
+Read1 after filtering:
+total reads: 13
+total bases: 2580
+Q20 bases: 2550(98.8372%)
+Q30 bases: 2450(94.9612%)
+
+Read2 after filtering:
+total reads: 13
+total bases: 2580
+Q20 bases: 2526(97.907%)
+Q30 bases: 2407(93.2946%)
+
+Filtering result:
+reads passed filter: 26
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 0
+reads with adapter trimmed: 16
+bases trimmed due to adapters: 1200
+
+Duplication rate: 0%
+
+Insert size peak (evaluated by paired-end reads): 365
+
+JSON report: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/fastp-Yell-July18-Site5w_S128_L001.fastp-trim.report.json
+HTML report: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/fastp-Yell-July18-Site5w_S128_L001.fastp-trim.report.html
+
+/home/sam/programs/fastp --in1 Yell_July18_Site5w_S128_R1_001.fastq.gz --in2 Yell_July18_Site5w_S128_R2_001.fastq.gz --detect_adapter_for_pe --trim_front1 20 --trim_front2 20 --trim_poly_g --thread 4 --html /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/fastp-Yell-July18-Site5w_S128_L001.fastp-trim.report.html --json /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/fastp-Yell-July18-Site5w_S128_L001.fastp-trim.report.json --out1 /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/fastp-Yell-July18-Site5w_S128_L001_R1_001.fastq.gz --out2 /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/fastp-Yell-July18-Site5w_S128_L001_R2_001.fastq.gz 
+fastp v0.24.0, time used: 0 seconds

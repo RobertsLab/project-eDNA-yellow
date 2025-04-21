@@ -42,6 +42,10 @@ knitr::opts_chunk$set(
 
 Inputs:
 
+- Trimmed FastQs from [`01.00-trimming-fastp-fastqc-multiqc.Rmd`](https://github.com/RobertsLab/project-eDNA-yellow/blob/9d2b4a6a77820edb0c3b7a78878a8c7ef6a61f61/code/01.00-trimming-fastp-fastqc-multiqc.Rmd)
+
+  - Filename format: `Yell_July18_Site1L_S101_L001_R1.fastp-trim.fastq.gz`
+
 
 Outputs:
 
@@ -73,18 +77,17 @@ qiime2_conda_env_name <- c("qiime2-amplicon-2024.10")
 qiime2_conda_path <- c("/home/sam/programs/miniforge3/condabin/conda")
 
 # Data directories
-data_dir <- "../data/"
-raw_reads_dir <- "../data/raw-fastqs"
-raw_reads_url <- "https://owl.fish.washington.edu/nightingales/eDNA-yellow_island-2023/"
+repo_dir <- "/home/sam/gitrepos/RobertsLab/project-eDNA-yellow"
+data_dir <- file.path(repo_dir, "data")
+trimmed_reads_dir <- file.path(repo_dir, "output", "01.00-trimming-fastp-fastqc-multiqc")
 
 # Output files/directories
-output_dir <- "../output/01.00-qiime2/"
+output_dir <- file.path(repo_dir, "output", "02.00-qiime2")
 
 # Export these as environment variables for bash chunks.
 Sys.setenv(
   data_dir = data_dir,
-  raw_reads_dir = raw_reads_dir,
-  raw_reads_url = raw_reads_url,
+  trimmed_reads_dir = trimmed_reads_dir,
   output_dir = output_dir
 )
 
@@ -107,31 +110,14 @@ py_config()
 
 
 
-## Rename files to match QIIME 2 conventions
-
-QIIME 2 expects a lane designation in the file names.
-
-```{r rename-fastqs, engine=bash, eval=TRUE}
-# Rename FastQ files to include lane information
-for file in "${raw_reads_dir}"/*_R[12]_001.fastq.gz
-do
-  new_file=$(echo "$file" | sed 's/_\(R[12]_001\)/_L001_\1/')
-  echo "Renaming $file to $new_file"
-  mv "$file" "$new_file"
-done
-
-ls -lh "${raw_reads_dir}"
-```
-
-
-# Import raw reads
-```{r import-raw-reads, engine=bash, eval=TRUE}
+# Import trimmed reads
+```{r import-trimmed-reads, engine=bash, eval=TRUE}
 # Make output directory if it doesn't exist
 mkdir --parents "${output_dir}"
 
 qiime tools import \
   --type 'SampleData[PairedEndSequencesWithQuality]' \
-  --input-path "${raw_reads_dir}" \
+  --input-path "${trimmed_reads_dir}" \
   --input-format CasavaOneEightSingleLanePerSampleDirFmt \
   --output-path "${output_dir}"/demux-paired-end.qza
 

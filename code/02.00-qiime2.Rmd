@@ -25,7 +25,7 @@ bibliography: references.bib
 
 # BACKGROUND
 
-This notebook will use [QIIME 2 2024.10](https://docs.qiime2.org/2024.10/) [@bolyen2019] to taxonomically classify eukaryotic sequences in eDNA samples.
+This notebook will use [QIIME 2 2024.10](https://docs.qiime2.org/2024.10/) [@bolyen2019] to taxonomically classify eukaryotic sequences in eDNA samples. Expects trimmed reads to exist in [`../output/01.00-trimming-fastp-fastqc-multiqc`](https://github.com/RobertsLab/project-eDNA-yellow/tree/main/output/01.00-trimming-fastp-fastqc-multiqc).
 
 ```{r setup, include=FALSE}
 library(knitr)
@@ -40,15 +40,46 @@ knitr::opts_chunk$set(
 )
 ```
 
-Inputs:
+## Inputs:
 
-- Trimmed FastQs from [`01.00-trimming-fastp-fastqc-multiqc.Rmd`](https://github.com/RobertsLab/project-eDNA-yellow/blob/9d2b4a6a77820edb0c3b7a78878a8c7ef6a61f61/code/01.00-trimming-fastp-fastqc-multiqc.Rmd)
+- Trimmed FastQs from [`01.00-trimming-fastp-fastqc-multiqc.Rmd`](https://github.com/RobertsLab/project-eDNA-yellow/blob/13bdbbec60b0da23266af2e0b409c2b09f3d38fa/code/01.00-trimming-fastp-fastqc-multiqc.Rmd)
 
-  - Filename format: `Yell_July18_Site1L_S101_L001_R1.fastp-trim.fastq.gz`
+  - Filename format: `fastp-Yell-July18-Site5e_S95_L001_R1_001.fastq.gz`
+  
+- SILVA classifier QZA `silva-138-99-nb-classifier.qza`.
+
+  - Downloaded from https://library.qiime2.org/data-resources#naive-bayes-classifiers
 
 
-Outputs:
+## Outputs:
 
+Files ending in `.qza` are  QIIME zip archives.
+
+Files ending in `.qzv` are QIIME zip visualization tables.
+
+- `deblur-stats.qza`: Stats after denoise.
+
+- `deblur-stats.qzv`: Stats visualization after denoise.
+
+- `demux-paired-end-filtered.qza`: Quality score filtered archive.
+
+- `demux-paired-end-filter-stats.qza`: Stats archive for quality score filtering.
+
+- `demux-paired-end.qza`: Paired-end reads archive.
+
+- `rep-seqs-deblur.qza`: Representative sequences after denoise.
+
+- `rep-seqs-deblur.qzv`: Representative sequences after denoise visualization.
+
+- `table-deblur.qza`: Table after denoise.
+
+- `table.qzv`: Feature table summary visuallization.
+
+- `taxa-bar-plots.qzv`: Bar plots of taxonomic assignment visualization.
+
+- `taxonomy.qza`: Feature taxonomic classification after applying SILVA classifier.
+
+- `taxonomy.qzv`: Feature taxonomic classification visualization after applying SILVA classifier.
 
 
 Software requirements:
@@ -79,14 +110,30 @@ qiime2_conda_path <- c("/home/sam/programs/miniforge3/condabin/conda")
 # Data directories
 repo_dir <- "/home/sam/gitrepos/RobertsLab/project-eDNA-yellow"
 data_dir <- file.path(repo_dir, "data")
+output_dir <- file.path(repo_dir, "output", "02.00-qiime2")
 trimmed_reads_dir <- file.path(repo_dir, "output", "01.00-trimming-fastp-fastqc-multiqc")
 
-# Output files/directories
-output_dir <- file.path(repo_dir, "output", "02.00-qiime2")
+# Files
+metadata <- file.path(data_dir, "raw-fastqs", "metadata.tsv")
+silva_classifier <- file.path(data_dir, "silva-138-99-nb-classifier.qza")
+
+# Parameters
+
+## Set Deblur read length
+## Based on FastQC results, post-trimming, where quality starts to decline.
+deblur_ptrim_length <- 150
+
+# CPUs
+threads <- 4
+
 
 # Export these as environment variables for bash chunks.
 Sys.setenv(
   data_dir = data_dir,
+  deblur_ptrim_length = deblur_ptrim_length,
+  metadata = metadata,
+  silva_classifier = silva_classifier,
+  threads = threads,
   trimmed_reads_dir = trimmed_reads_dir,
   output_dir = output_dir
 )
@@ -109,24 +156,93 @@ py_config()
 ```
 
 
-
 # Import trimmed reads
+
+## Transfer trimmed reads
 ```{r import-trimmed-reads, engine=bash, eval=TRUE}
 # Make output directory if it doesn't exist
 mkdir --parents "${output_dir}"
 
+rsync -avP "${trimmed_reads_dir}"/*.fastq.gz "${output_dir}"
+
+ls -lh "${output_dir}"
+```
+
+## Import to QIIME2 QZA format
+```{r import-trimmed-reads, engine=bash, eval=TRUE}
+
 qiime tools import \
   --type 'SampleData[PairedEndSequencesWithQuality]' \
-  --input-path "${trimmed_reads_dir}" \
+  --input-path "${output_dir}" \
   --input-format CasavaOneEightSingleLanePerSampleDirFmt \
   --output-path "${output_dir}"/demux-paired-end.qza
 
 ```
 
 # Deblur
+
+## Quality filter
 ```{r deblur, engine=bash, eval=TRUE}
 qiime quality-filter q-score \
  --i-demux "${output_dir}"/demux-paired-end.qza \
  --o-filtered-sequences "${output_dir}"/demux-paired-end-filtered.qza \
  --o-filter-stats "${output_dir}"/demux-paired-end-filter-stats.qza
+```
+
+## Denoise
+
+Trim length is based on FastQC results,
+where most samples show sharp drop in quality scores.
+
+```{r deblur-denoise, engine=bash, eval=TRUE}
+qiime deblur denoise-other \
+  --i-demultiplexed-seqs "${output_dir}"/demux-paired-end-filtered.qza \
+  --i-reference-seqs "${silva_seqs}" \
+  --p-trim-length "${deblur_ptrim_length}" \
+  --o-representative-sequences "${output_dir}"/rep-seqs-deblur.qza \
+  --o-table "${output_dir}"/table-deblur.qza \
+  --p-sample-stats \
+  --p-jobs-to-start "${threads}" \
+  --o-stats "${output_dir}"/deblur-stats.qza
+```
+
+## Deblur visualization
+```{r deblur-visualization, engine=bash, eval=TRUE}
+qiime deblur visualize-stats \
+  --i-deblur-stats "${output_dir}"/deblur-stats.qza \
+  --o-visualization "${output_dir}"/deblur-stats.qzv
+```
+
+# Feature Table
+```{r feature-table, engine=bash, eval=TRUE}
+qiime feature-table summarize \
+  --i-table "${output_dir}"/table-deblur.qza \
+  --o-visualization "${output_dir}"/table.qzv \
+  --m-sample-metadata-file "${metadata}"
+
+qiime feature-table tabulate-seqs \
+  --i-data "${output_dir}"/rep-seqs-deblur.qza \
+  --o-visualization "${output_dir}"/rep-seqs-deblur.qzv
+
+```
+
+# Taxonomy
+
+```{r taxonomic-classification, engine=bash, eval=TRUE}
+qiime feature-classifier classify-sklearn \
+  --i-classifier "${silva_classifier}" \
+  --i-reads "${output_dir}"/rep-seqs-deblur.qza \
+  --o-classification "${output_dir}"/taxonomy.qza
+
+qiime metadata tabulate \
+  --m-input-file "${output_dir}"/taxonomy.qza \
+  --o-visualization "${output_dir}"/taxonomy.qzv
+```
+
+```{r taxonomic-bar-plots, engine=bash, eval=TRUE}
+qiime taxa barplot \
+  --i-table "${output_dir}"/table-deblur.qza \
+  --i-taxonomy "${output_dir}"/taxonomy.qza \
+  --m-metadata-file "${metadata}" \
+  --o-visualization "${output_dir}"/taxa-bar-plots.qzv
 ```

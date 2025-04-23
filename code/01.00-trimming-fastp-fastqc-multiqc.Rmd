@@ -54,7 +54,7 @@ Outputs:
 
 -   Trimmed FastQs.
 
-    -   Example filename format: `fastp-Yell-July18-Site1z_S129_L001_R1_001.fastq.gz`
+    -   Example filename format: `Site1z_S129_L001_R1_001.fastq.gz`
 
 -   fastp JSON files.
 
@@ -122,12 +122,27 @@ mkdir --parents "${output_dir}"
 # Change to raw reads directory
 cd "${raw_reads_dir}"
 
+# Initialize metadata file for QIIME2 usage
+printf "%s\t%s\n" "id" "site" > metadata.tsv
+
 # Create arrays of fastq R1 files and sample names
 # Renames to match QIIME2 regex
+# Adds id to metadata TSV file
 for fastq in ${R1_fastq_pattern}
 do
+  # Extract site information from filename using awk
+  site=$(echo "${fastq}" | awk -F'_' '{print $3}')
+  
+  # Check if site information was extracted
+  if [[ -n "${site}" ]]; then
+    site_name=$(echo "$site" | sed 's/Site//')
+    echo -e "${site}\t${site_name}" >> metadata.tsv
+  else
+    echo "Site information not found in filename: ${fastq}"
+  fi
+  
   fastq_array_R1+=("${fastq}")
-  R1_names_array+=("$(echo "${fastq}" | awk -F'_' '{print "fastp-"$1"-"$2"-"$3"_"$4"_L001"}')")
+  R1_names_array+=("$(echo "${fastq}" | awk -F'_' '{print $3"_"$4"_L001"}')")
 done
 
 
@@ -137,7 +152,7 @@ done
 for fastq in ${R2_fastq_pattern}
 do
   fastq_array_R2+=("${fastq}")
-  R2_names_array+=("$(echo "${fastq}" | awk -F"_" '{print "fastp-"$1"-"$2"-"$3"_"$4"_L001"}')")
+  R2_names_array+=("$(echo "${fastq}" | awk -F"_" '{print $3"_"$4"_L001"}')")
 done
 
 # Create list of fastq files used in analysis

@@ -1,0 +1,47 @@
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 160579
+total bases: 48334279
+Q20 bases: 46462340(96.1271%)
+Q30 bases: 42258256(87.4292%)
+
+Read2 before filtering:
+total reads: 160579
+total bases: 48334279
+Q20 bases: 46130101(95.4397%)
+Q30 bases: 41844266(86.5726%)
+
+Read1 after filtering:
+total reads: 159290
+total bases: 24723330
+Q20 bases: 24225876(97.9879%)
+Q30 bases: 22827998(92.3338%)
+
+Read2 after filtering:
+total reads: 159290
+total bases: 24738471
+Q20 bases: 23758711(96.0395%)
+Q30 bases: 21536224(87.0556%)
+
+Filtering result:
+reads passed filter: 318580
+reads failed due to low quality: 1940
+reads failed due to too many N: 4
+reads failed due to too short: 634
+reads with adapter trimmed: 285110
+bases trimmed due to adapters: 21446267
+
+Duplication rate: 36.143%
+
+Insert size peak (evaluated by paired-end reads): 167
+
+JSON report: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Site5a_S87_L001.fastp-trim.report.json
+HTML report: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Site5a_S87_L001.fastp-trim.report.html
+
+/home/sam/programs/fastp --in1 Yell_July18_Site5a_S87_R1_001.fastq.gz --in2 Yell_July18_Site5a_S87_R2_001.fastq.gz --detect_adapter_for_pe --trim_front1 20 --trim_front2 20 --trim_poly_g --thread 4 --html /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Site5a_S87_L001.fastp-trim.report.html --json /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Site5a_S87_L001.fastp-trim.report.json --out1 /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Site5a_S87_L001_R1_001.fastq.gz --out2 /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc/Site5a_S87_L001_R2_001.fastq.gz 
+fastp v0.24.0, time used: 23 seconds

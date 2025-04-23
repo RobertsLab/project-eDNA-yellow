@@ -1,3 +1,3 @@
-[2025-04-21 11:19:21,702] multiqc.core.file_search                           [INFO   ]  Search path: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc
-[2025-04-21 11:19:25,670] multiqc.modules.fastp.fastp                        [INFO   ]  Found 54 reports
-[2025-04-21 11:19:27,481] multiqc.modules.fastqc.fastqc                      [INFO   ]  Found 108 reports
+[2025-04-22 17:11:50,639] multiqc.core.file_search                           [INFO   ]  Search path: /home/sam/gitrepos/RobertsLab/project-eDNA-yellow/output/01.00-trimming-fastp-fastqc-multiqc
+[2025-04-22 17:11:54,676] multiqc.modules.fastp.fastp                        [INFO   ]  Found 54 reports
+[2025-04-22 17:11:56,487] multiqc.modules.fastqc.fastqc                      [INFO   ]  Found 108 reports

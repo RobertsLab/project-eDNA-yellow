@@ -11,3 +11,7 @@
 *.bam
 .DS_Store
 *.bt2
+demux-paired-end-filtered.qza
+demux-paired-end.qza
+silva-138-99-nb-classifier.qza
+

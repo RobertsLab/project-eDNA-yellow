@@ -102,6 +102,10 @@ which conda
 
 # Set R variables
 
+Change `repo_dir` to match local repo location.
+
+Change `threads <- 4` to match computer resources for your system.
+
 ```{r R-variables, eval=TRUE}
 # Conda info
 qiime2_conda_env_name <- c("qiime2-amplicon-2024.10")
@@ -159,7 +163,7 @@ py_config()
 # Import trimmed reads
 
 ## Transfer trimmed reads
-```{r import-trimmed-reads, engine=bash, eval=TRUE}
+```{r transfer-trimmed-reads, engine='bash', eval=TRUE}
 # Make output directory if it doesn't exist
 mkdir --parents "${output_dir}"
 
@@ -169,20 +173,23 @@ ls -lh "${output_dir}"
 ```
 
 ## Import to QIIME2 QZA format
-```{r import-trimmed-reads, engine=bash, eval=TRUE}
+```{r import-trimmed-reads, engine='bash', eval=TRUE}
 
 qiime tools import \
   --type 'SampleData[PairedEndSequencesWithQuality]' \
   --input-path "${output_dir}" \
   --input-format CasavaOneEightSingleLanePerSampleDirFmt \
   --output-path "${output_dir}"/demux-paired-end.qza
+  
+# Remove trimmed reads
+rm "${output_dir}"/*.fastq.gz
 
 ```
 
 # Deblur
 
 ## Quality filter
-```{r deblur, engine=bash, eval=TRUE}
+```{r deblur, engine='bash', eval=TRUE}
 qiime quality-filter q-score \
  --i-demux "${output_dir}"/demux-paired-end.qza \
  --o-filtered-sequences "${output_dir}"/demux-paired-end-filtered.qza \
@@ -194,10 +201,10 @@ qiime quality-filter q-score \
 Trim length is based on FastQC results,
 where most samples show sharp drop in quality scores.
 
-```{r deblur-denoise, engine=bash, eval=TRUE}
+```{r deblur-denoise, engine='bash', eval=TRUE}
 qiime deblur denoise-other \
   --i-demultiplexed-seqs "${output_dir}"/demux-paired-end-filtered.qza \
-  --i-reference-seqs "${silva_seqs}" \
+  --i-reference-seqs "${silva_classifier}" \
   --p-trim-length "${deblur_ptrim_length}" \
   --o-representative-sequences "${output_dir}"/rep-seqs-deblur.qza \
   --o-table "${output_dir}"/table-deblur.qza \
@@ -207,14 +214,14 @@ qiime deblur denoise-other \
 ```
 
 ## Deblur visualization
-```{r deblur-visualization, engine=bash, eval=TRUE}
+```{r deblur-visualization, engine='bash', eval=TRUE}
 qiime deblur visualize-stats \
   --i-deblur-stats "${output_dir}"/deblur-stats.qza \
   --o-visualization "${output_dir}"/deblur-stats.qzv
 ```
 
 # Feature Table
-```{r feature-table, engine=bash, eval=TRUE}
+```{r feature-table, engine='bash', eval=TRUE}
 qiime feature-table summarize \
   --i-table "${output_dir}"/table-deblur.qza \
   --o-visualization "${output_dir}"/table.qzv \
@@ -228,7 +235,9 @@ qiime feature-table tabulate-seqs \
 
 # Taxonomy
 
-```{r taxonomic-classification, engine=bash, eval=TRUE}
+## Classification
+
+```{r taxonomic-classification, engine='bash', eval=TRUE}
 qiime feature-classifier classify-sklearn \
   --i-classifier "${silva_classifier}" \
   --i-reads "${output_dir}"/rep-seqs-deblur.qza \
@@ -239,10 +248,14 @@ qiime metadata tabulate \
   --o-visualization "${output_dir}"/taxonomy.qzv
 ```
 
-```{r taxonomic-bar-plots, engine=bash, eval=TRUE}
+## Bar plots
+```{r taxonomic-bar-plots, engine='bash', eval=TRUE}
 qiime taxa barplot \
   --i-table "${output_dir}"/table-deblur.qza \
   --i-taxonomy "${output_dir}"/taxonomy.qza \
   --m-metadata-file "${metadata}" \
   --o-visualization "${output_dir}"/taxa-bar-plots.qzv
+
+
 ```
+

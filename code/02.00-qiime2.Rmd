@@ -120,6 +120,7 @@ trimmed_reads_dir <- file.path(repo_dir, "output", "01.00-trimming-fastp-fastqc-
 # Files
 metadata <- file.path(data_dir, "raw-fastqs", "metadata.tsv")
 silva_classifier <- file.path(data_dir, "silva-138-99-nb-classifier.qza")
+silva_ref_seqs <- file.path(data_dir, "silva-138-99-seqs.qza")
 
 # Parameters
 
@@ -137,6 +138,7 @@ Sys.setenv(
   deblur_ptrim_length = deblur_ptrim_length,
   metadata = metadata,
   silva_classifier = silva_classifier,
+  silva_ref_seqs = silva_ref_seqs,
   threads = threads,
   trimmed_reads_dir = trimmed_reads_dir,
   output_dir = output_dir
@@ -204,7 +206,7 @@ where most samples show sharp drop in quality scores.
 ```{r deblur-denoise, engine='bash', eval=TRUE}
 qiime deblur denoise-other \
   --i-demultiplexed-seqs "${output_dir}"/demux-paired-end-filtered.qza \
-  --i-reference-seqs "${silva_classifier}" \
+  --i-reference-seqs "${silva_ref_seqs}" \
   --p-trim-length "${deblur_ptrim_length}" \
   --o-representative-sequences "${output_dir}"/rep-seqs-deblur.qza \
   --o-table "${output_dir}"/table-deblur.qza \

@@ -108,7 +108,7 @@ items:
 - [ ] Investigate low deblur retention (~7.8% of reads reach the feature table).
 - [ ] Add downstream ecology: alpha/beta diversity and Site 1 vs. Site 5 comparison, with exported figures/tables (not just `.qzv`).
 - [ ] Confirm paired-end handling in `02.00` — reads are imported as paired-end but `deblur denoise-other` operates on forward reads; verify R2 use is as intended.
-- [ ] Resolve repo weight (~1.5 GB tracked; trimmed FastQs and QC HTMLs are committed) — see the hygiene notes in [`data/README.md`](data/README.md).
+- [x] Untrack ~1.2 GB of intermediate data (trimmed FastQs + `multiqc_data.json`) — see [`data/README.md`](data/README.md). (History rewrite to shrink `.git` still optional.)
 
 ## Attribution
 

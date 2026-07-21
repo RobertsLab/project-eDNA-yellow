@@ -15,3 +15,6 @@ demux-paired-end-filtered.qza
 demux-paired-end.qza
 silva-138-99-nb-classifier.qza
 
+# MultiQC raw data dump (large; summary report .html is kept)
+multiqc_data.json
+
